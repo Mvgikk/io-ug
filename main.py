@@ -1,49 +1,65 @@
 import math
-from datetime import datetime
+import random
+import numpy as np
+import matplotlib.pyplot as plt
 
-def calculate_days_lived(birth_date):
-    today = datetime.today()
-    delta = today - birth_date
-    return delta.days
+v0 = 50
+h = 100
+g = 9.81
 
-def biorhythm_value(cycle_length, days_lived):
-    return math.sin(2 * math.pi * days_lived / cycle_length)
+def calculate_distance(angle_degrees):
+    angle_radians = math.radians(angle_degrees)
+    return (v0 * math.cos(angle_radians) / g) * (
+        v0 * math.sin(angle_radians) + math.sqrt(v0 ** 2 * math.sin(angle_radians) ** 2 + 2 * g * h))
 
-def check_biorhythm_status(biorhythm, next_biorhythm, name, type):
-    if biorhythm > 0.5:
-        print(f"Twoj {type} biorytm jest wysoki ({biorhythm:.2f}). Gratulacje, {name}!")
-    elif biorhythm < -0.5:
-        print(f"Twoj {type} biorytm jest niski ({biorhythm:.2f}). To nie jest najlepszy dzien, {name}.")
-        if next_biorhythm > biorhythm:
-            print("Nie martw sie. Jutro będzie lepiej!")
+
+def calculate_trajectory(angle_degrees):
+    angle_radians = np.radians(angle_degrees)
+    
+    t_flight = (v0 * np.sin(angle_radians) + np.sqrt(v0 ** 2 * np.sin(angle_radians) ** 2 + 2 * g * h)) / g
+    
+    t = np.linspace(0, t_flight, num=500)
+    
+    x = v0 * np.cos(angle_radians) * t
+    y = h + v0 * np.sin(angle_radians) * t - 0.5 * g * t ** 2
+    
+    return x, y
+
+def plot_trajectory(x, y):
+    plt.figure(figsize=(8, 6))
+    plt.plot(x, y, label="Trajectoria pocisku", color="blue")
+
+    plt.title("Projectile Motion for the Trebuchet")
+    plt.xlabel("Distance (m)")
+    plt.ylabel("Height (m)")
+
+    plt.grid(True)
+
+    plt.xlim(0, 350)
+    plt.ylim(0, 160)
+
+    plt.savefig('trajektoria.png')
+
+    plt.show()
+
+
+target_distance = random.randint(50, 340)
+print(f"Cel znajduje się w odległości: {target_distance} metrów.")
+
+attempts = 0
+while True:
+        angle = float(input("Podaj kąt strzału (w stopniach): "))
+        attempts += 1
+        
+        distance = calculate_distance(angle)
+        print(f"Pocisk przeleciał {distance:.2f} metrów.")
+        
+        if target_distance - 5 <= distance <= target_distance + 5:
+            print(f"Cel trafiony! Liczba prób: {attempts}")
+            
+            x, y = calculate_trajectory(angle)
+            
+            plot_trajectory(x, y)
+            break
         else:
-            print("Niestety, jutro moze byc podobnie, ale trzymaj sie!")
-
-name = input("Podaj swoje imie: ")
-year = int(input("Podaj rok urodzenia: "))
-month = int(input("Podaj miesiąc urodzenia (1-12): "))
-day = int(input("Podaj dzień urodzenia (1-31): "))
-
-birth_date = datetime(year, month, day)
-days_lived = calculate_days_lived(birth_date)
-
-physical_today = biorhythm_value(23, days_lived)
-emotional_today = biorhythm_value(28, days_lived)
-intellectual_today = biorhythm_value(33, days_lived)
-
-physical_tomorrow = biorhythm_value(23, days_lived + 1)
-emotional_tomorrow = biorhythm_value(28, days_lived + 1)
-intellectual_tomorrow = biorhythm_value(33, days_lived + 1)
-
-print(f"\nWitaj, {name}!")
-print(f"Dzis jest {days_lived} dzien twojego życia.")
-print(f"Twoje wyniki biorytmów na dzis:")
-print(f"Fizyczny: {physical_today:.2f}")
-print(f"Emocjonalny: {emotional_today:.2f}")
-print(f"Intelektualny: {intellectual_today:.2f}")
-
-# Sprawdzanie biorytmów
-check_biorhythm_status(physical_today, physical_tomorrow, name, "fizyczny")
-check_biorhythm_status(emotional_today, emotional_tomorrow, name, "emocjonalny")
-check_biorhythm_status(intellectual_today, intellectual_tomorrow, name, "intelektualny")
-
+            print("Chybiony! Spróbuj ponownie.")
