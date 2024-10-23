@@ -32,7 +32,7 @@ plt.show()
 #normalizacja min-max
 
 scaler = MinMaxScaler()
-X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
+X_min_max = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
 
 colors = ['r', 'g', 'b']
 target_names = iris.target_names
@@ -40,7 +40,7 @@ target_names = iris.target_names
 plt.figure(figsize=(8, 6))
 
 for color, i, target_name in zip(colors, [0, 1, 2], target_names):
-    plt.scatter(X_scaled.loc[y == i, 'sepal length (cm)'], X_scaled.loc[y == i, 'sepal width (cm)'], 
+    plt.scatter(X_min_max.loc[y == i, 'sepal length (cm)'], X_min_max.loc[y == i, 'sepal width (cm)'], 
                 color=color, label=target_name)
 
 plt.legend()
@@ -61,7 +61,7 @@ target_names = iris.target_names
 plt.figure(figsize=(8, 6))
 
 for color, i, target_name in zip(colors, [0, 1, 2], target_names):
-    plt.scatter(X_scaled.loc[y == i, 'sepal length (cm)'], X_scaled.loc[y == i, 'sepal width (cm)'], 
+    plt.scatter(X_zscore.loc[y == i, 'sepal length (cm)'], X_zscore.loc[y == i, 'sepal width (cm)'], 
                 color=color, label=target_name)
 
 plt.legend()
@@ -70,3 +70,12 @@ plt.xlabel('Sepal Length (cm)')
 plt.ylabel('Sepal Width (cm)')
 plt.grid(True)
 plt.show()
+
+
+
+print("Dane po Min-Max normalizacji:")
+print(X_min_max.head())
+
+
+print("\nDane po Z-Score normalizacji:")
+print(X_zscore.head())
