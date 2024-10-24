@@ -1,46 +1,18 @@
-import pandas as pd
+import math
 
-#a
+def forwardPass(wiek, waga, wzrost):
+    hidden1 = wiek * -0.46122 + waga * 0.97314 + wzrost * -0.39203 + 0.80109
+    hidden1_po_aktywacji = act(hidden1)
+    hidden2 =  wiek * 0.78548 + waga * 2.10584 + wzrost * -0.57847
+    hidden2_po_aktywacji = act(hidden2)
+    output = (hidden1_po_aktywacji * -0.81546 + hidden2_po_aktywacji * 1.03775) -0.2368
+    return output
 
-missing_values = ['NA','-']
-df = pd.read_csv('iris_with_errors.csv',na_values=missing_values)
+def act(x):
+    return 1/(1+(math.e)**(-x))
 
-print(df.isnull().sum())
+#  = 0.798528
+print(f"Wynik  = {forwardPass(23,75,176)}")
 
-
-#b 
-
-
-for column in df.columns:
-    if column != 'variety':
-        
-        median_value = df[column].median()
-
-        for index, value in df[column].items():
-            if pd.isnull(value) or (value < 0 or value > 15):
-                df.at[index, column] = median_value
-
-        print(df[column].values)
-
-
-#c
-
-valid_records = ['Setosa', 'Versicolor', 'Virginica']
-
-for index, record in df['variety'].items():
-    if record not in valid_records:
-        print(f"Błędny gatunek {index}: {record}")
-        
-        prev_record = df.at[index - 1, 'variety'] if index > 0 else None
-        next_record = df.at[index + 1, 'variety'] if index < len(df) - 1 else None
-
-        if prev_record == next_record and prev_record in valid_records:
-            corrected_record = prev_record
-            df.at[index, 'variety'] = corrected_record
-
-        df.at[index, 'variety'] = corrected_record
-        print(f"Poprawiono  na: {corrected_record}")
-
-# Wyświetlenie wartości po poprawkach
-print("\n variety po poprawkach:")
-print(df['variety'].values)
+#  = -0.0145181
+print(f"Wynik  = {forwardPass(28,120,175)}")
