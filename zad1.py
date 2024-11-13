@@ -1,18 +1,39 @@
-import math
+from sklearn.model_selection import train_test_split
+import pandas as pd
+import numpy as np
 
-def forwardPass(wiek, waga, wzrost):
-    hidden1 = wiek * -0.46122 + waga * 0.97314 + wzrost * -0.39203 + 0.80109
-    hidden1_po_aktywacji = act(hidden1)
-    hidden2 =  wiek * 0.78548 + waga * 2.10584 + wzrost * -0.57847
-    hidden2_po_aktywacji = act(hidden2)
-    output = (hidden1_po_aktywacji * -0.81546 + hidden2_po_aktywacji * 1.03775) -0.2368
-    return output
+def classify_iris(sl,sw,pl,pw):
+    if sl > 4 and pl <= 2 and pw <=0.5:
+        return "Setosa"
+    elif pl > 5 and pw >= 2:
+        return "Virginica"
+    else:
+        return "Versicolor"
+    
 
-def act(x):
-    return 1/(1+(math.e)**(-x))
+df = pd.read_csv('iris.csv')
 
-#  = 0.798528
-print(f"Wynik  = {forwardPass(23,75,176)}")
+# print(df)
 
-#  = -0.0145181
-print(f"Wynik  = {forwardPass(28,120,175)}")
+(train_set, test_set) = train_test_split(df.values, train_size=0.7,random_state=300913)
+
+train_inputs = train_set[:,0:4]
+train_classes = train_set[:, 4]
+test_inputs = test_set[:,0:4]
+test_classes = test_set[:,4]
+
+good_predictions= 0
+len = test_set.shape[0]
+
+for i in range(len):
+    if(classify_iris(sl=test_inputs[i,0], pl= test_inputs[i,2], sw=test_inputs[i,1],pw = test_inputs[i,3]) == test_set[i,4]):
+        good_predictions += 1
+
+print(f"good_predictions = {good_predictions}")
+print(f"{good_predictions/len*100} %")
+
+
+train_set = train_set[np.argsort(train_classes)]
+
+
+# print(train_set)
