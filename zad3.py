@@ -45,8 +45,11 @@ predictions_nb = nb.predict(test_inputs)
 accuracy_nb = accuracy_score(test_classes, predictions_nb)
 conf_matrix_nb = confusion_matrix(test_classes, predictions_nb)
 
-print(f"Naive Bayes - Dokładność: {accuracy_nb}")
+print(f"Dokładność NB: {accuracy_nb}")
 disp = ConfusionMatrixDisplay(confusion_matrix=conf_matrix_nb, display_labels=nb.classes_)
 disp.plot()
 plt.title("Macierz błędów dla Naive Bayes")
 plt.show()
+
+
+## dd 95 nb 95

@@ -25,8 +25,8 @@ test_classes = test_set[:,4]
 # print(f"test inputs \n{test_inputs}")
 # print(f"test classes \n{test_classes}")
 
-print(f"train set \n{train_set}")
-print(f"test set \n{test_set}")
+# print(f"train set \n{train_set}")
+# print(f"test set \n{test_set}")
 
 clf = tree.DecisionTreeClassifier()
 clf = clf.fit(train_inputs,train_classes)
@@ -38,7 +38,7 @@ clf = clf.fit(train_inputs,train_classes)
 
 predictions = clf.predict(test_inputs)
 accuracy = accuracy_score(test_classes, predictions)
-print(f"Dokładność klasyfikatora: {accuracy}")
+print(f"Dokładność DD: {accuracy}")
 
 conf_matrix = confusion_matrix(test_classes, predictions)
 
