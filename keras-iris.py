@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.utils import plot_model
+from tensorflow.keras.optimizers import Adam
 
 # Load the iris dataset
 iris = load_iris()
@@ -14,11 +15,15 @@ y = iris.target
 
 # Preprocess the data
 # Scale the features
+# standaryzacja danych wokół 0 
+#[5.1, 7.0, 6.3] -> [-1.29, 1.09, 0.21],
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Encode the labels
-encoder = OneHotEncoder(sparse=False)
+#przekszatałcenie etykiet na macierz binarną
+#[0, 1, 2] ->[[1, 0, 0], [0, 1, 0], [0, 0, 1]], 
+encoder = OneHotEncoder(sparse_output=False)
 y_encoded = encoder.fit_transform(y.reshape(-1, 1))
 
 # Split the dataset into training and test sets
@@ -26,16 +31,29 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_encoded, test_si
 
 # Define the model
 model = Sequential([
-    Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
-    Dense(64, activation='relu'),
+    Dense(64, activation='leaky_relu', input_shape=(X_train.shape[1],)),
+    Dense(64, activation='leaky_relu'),
     Dense(y_encoded.shape[1], activation='softmax')
 ])
+#Model ma 4 neurony w warstwie wejsciowej - długosc szerokosc kielicha i platka
+# x_train.shape[0] - liczba wierszy x_train.shape[1] - liczba kolumn
+
+# warstwa wyjściowa ma 3 neurony
+# y_encoded.shape[1] - liczba kolumn w zakodowanych etykietach
+
 
 # Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=Adam(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
+# ^ zmieniona szybkość uczenia, 
+# rozne optymalizatory daja rozne wyniki sgd troche gorzej wypadl
+
 
 # Train the model
-history = model.fit(X_train, y_train, epochs=100, validation_split=0.2)
+history = model.fit(X_train, y_train, epochs=100, validation_split=0.2, batch_size=4)
+
+# najlepsza wydajność około 30-40 epoki. po tym stabilnie.
+# Brak oznak niedouczenia: Model osiąga wysokie wartości dokładności zarówno na zbiorze treningowym, jak i walidacyjnym, co oznacza, że dobrze nauczył się wzorców z danych.
+# Brak oznak przeuczenia: Krzywe walidacyjne i treningowe są blisko siebie i mają stabilny przebieg. Różnica między stratą treningową a walidacyjną nie jest duża, co oznacza, że model generalizuje dobrze.
 
 # Evaluate the model on the test set
 test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)
@@ -69,3 +87,10 @@ model.save('iris_model.h5')
 
 # Plot and save the model architecture
 plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
+
+
+# h) 
+# wczytujemy i przetwarzamy dane standaryzacja cech, one-hot encoding etykiet.
+# Następnie dzielimy dane na treningowe i testowe
+# Wczytujemy model wytrenowany model iris_model.h5 i trenujemy dalej przez 10 epok.
+#   oceniamy nowo wytrenowany model na zbiorze testowym.
