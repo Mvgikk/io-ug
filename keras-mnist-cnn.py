@@ -6,7 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
 from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import confusion_matrix
-from tensorflow.keras.callbacks import History
+from tensorflow.keras.callbacks import History, ModelCheckpoint
 
 # Load dataset
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
@@ -17,6 +17,26 @@ test_images = test_images.reshape((test_images.shape[0], 28, 28, 1)).astype('flo
 train_labels = to_categorical(train_labels)
 test_labels = to_categorical(test_labels)
 original_test_labels = np.argmax(test_labels, axis=1)  # Save original labels for confusion matrix
+
+# w reshape przekształcamy obrazy do formatu 28, 28, 1, wys, szer , liczba kanałow (zostajemy przy odcieniach szarosci)
+# to_categorical - one hot encoding etykiet klas - przeksztalcamy na  wektor binarny 3 -> [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+# np.argmax indeks najwiekszej wartosci  axis = 1 przetwarzamy kazdy wiersz osobno, zamiana wektory one hot na ich pierwotne reprezentacje liczbowe
+
+
+# b )
+# przepływ przez sieć
+# dane wejsciowe (28,28,1), wartosci pikseli znormalizowane [0,1]
+# warstwa CONV2D wejscie ^ pozniej stosuje 32 filtry o wymiarze 3,3 wyjscie - 26,26,32 dla kazdego filtra mamy osobna mape cech o wymiarze 26x26
+# warstwa MAXPOOLING2D - wejscie ^  redukuje wymiary obrazu  wyjscie - 13,13,32 
+# FLATTEN - wejscie ^ wyjscie splaszcone dane na jednowymiarowy wektor 13 * 13 * 32 = 5408
+# DENSE - wejscie wektor 5408 wyjscie 64 elementowy wektor
+# DENSE wescjie 64 elementowy wektor  - wyjscie 10 elementowy wektor z prawdopodobienstwami dla kazdej z klas (0-9)
+
+
+#c )
+# 4 i 9 oraz 5 i 3
+
+#d) Przeuczenie - dokladnosc treningowa wyzsza niz dokladnosc walidacyjna
 
 # Define model
 model = Sequential([
@@ -30,9 +50,11 @@ model = Sequential([
 # Compile model
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
+checkpoint = ModelCheckpoint('best_model_epoch_{epoch:02d}.keras', monitor='val_accuracy', save_best_only=True, mode='max', verbose=1)
+
 # Train model
 history = History()
-model.fit(train_images, train_labels, epochs=5, batch_size=64, validation_split=0.2, callbacks=[history])
+model.fit(train_images, train_labels, epochs=5, batch_size=64, validation_split=0.2, callbacks=[history, checkpoint])
 
 # Evaluate on test set
 test_loss, test_acc = model.evaluate(test_images, test_labels)
