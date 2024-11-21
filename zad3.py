@@ -127,7 +127,7 @@ history = model.fit(
 np.save('history.npy', history.history)
 
 
-# d) Dokonaj walidacji i podaj krzywą uczenia się
+# d)
 
 # Wykres krzywej uczenia się dla dokładności
 plt.figure(figsize=(14, 5))

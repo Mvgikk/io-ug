@@ -15,13 +15,13 @@ y = iris.target
 
 # Preprocess the data
 # Scale the features
-# standaryzacja danych wokół 0 
+# a )standaryzacja danych wokół 0 
 #[5.1, 7.0, 6.3] -> [-1.29, 1.09, 0.21],
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Encode the labels
-#przekszatałcenie etykiet na macierz binarną
+# b) przekszatałcenie etykiet na macierz binarną
 #[0, 1, 2] ->[[1, 0, 0], [0, 1, 0], [0, 0, 1]], 
 encoder = OneHotEncoder(sparse_output=False)
 y_encoded = encoder.fit_transform(y.reshape(-1, 1))
@@ -35,7 +35,7 @@ model = Sequential([
     Dense(64, activation='leaky_relu'),
     Dense(y_encoded.shape[1], activation='softmax')
 ])
-#Model ma 4 neurony w warstwie wejsciowej - długosc szerokosc kielicha i platka
+# c) Model ma 4 neurony w warstwie wejsciowej - długosc szerokosc kielicha i platka
 # x_train.shape[0] - liczba wierszy x_train.shape[1] - liczba kolumn
 
 # warstwa wyjściowa ma 3 neurony
